@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register | VERISE</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+
+<main class="auth">
+  <aside class="auth-side">
+    <h2>Join VERISE</h2>
+    <p>Create your account and start discovering more.</p>
+    <ul>
+      <li>Save your favourite products</li>
+      <li>Fast, secure checkout</li>
+      <li>Track your orders</li>
+    </ul>
+  </aside>
+
+  <section class="auth-card">
+    <h1>Create account</h1>
+    <p class="sub">It only takes a minute.</p>
+    <div id="msg" class="msg"></div>
+
+    <form id="regForm" novalidate>
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" type="text" autocomplete="name">
+        <div class="err" id="nameErr"></div>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email">
+        <div class="err" id="emailErr"></div>
+      </div>
+      <div class="field">
+        <label for="phone">Mobile number</label>
+        <input id="phone" type="tel" maxlength="10" autocomplete="tel">
+        <div class="err" id="phoneErr"></div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="new-password">
+        <div class="err" id="passwordErr"></div>
+      </div>
+      <div class="field">
+        <label for="confirm">Confirm password</label>
+        <input id="confirm" type="password" autocomplete="new-password">
+        <div class="err" id="confirmErr"></div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Register</button>
+    </form>
+
+    <p class="alt">Already have an account? <a href="login.html">Login</a></p>
+  </section>
+</main>
+
+<div id="footer"></div>
+<script src="js/app.js"></script>
+<script>
+// Turns a password into a scrambled hash so it is not stored as plain text.
+async function hash(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+const val = id => document.getElementById(id).value.trim();
+
+document.getElementById('regForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const name = val('name');
+  const email = val('email').toLowerCase();
+  const phone = val('phone');
+  const password = document.getElementById('password').value;
+  const confirm = document.getElementById('confirm').value;
+  let ok = true;
+
+  const check = (id, bad, text) => { setErr(id, bad ? text : ''); if (bad) ok = false; };
+
+  check('name', name.length < 2, 'Please enter your full name.');
+  check('email', !isEmail(email), 'Enter a valid email address.');
+  check('phone', !isPhone(phone), 'Enter a valid 10-digit mobile number.');
+  check('password', password.length < 6, 'Password must be at least 6 characters.');
+  check('confirm', confirm !== password, 'Passwords do not match.');
+
+  if (!ok) return;
+
+  const users = getUsers();
+  if (users.some(u => u.email === email)) {
+    showMsg('This email is already registered. Please login.', false);
+    return;
+  }
+
+  users.push({
+    name, email, phone,
+    password: await hash(password),
+    joined: new Date().toISOString()
+  });
+  saveUsers(users);
+
+  showMsg('Account created! Redirecting to login…', true);
+  setTimeout(() => (location.href = 'login.html'), 1200);
+});
+</script>
+</body>
+</html>
