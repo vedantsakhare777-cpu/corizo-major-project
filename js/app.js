@@ -37,7 +37,16 @@ const PRODUCTS = [
     desc: 'A pair of slow-cured soaps made with nourishing oils and a soft, clean scent. Thoughtful care for everyday skin.' }
 ];
 
-const imgOf = p => p.img || `images/p${p.id}.jpg`;
+// Search word used to find a photo for each product (products 17-20 already have their own photos)
+const KEYWORDS = {
+  1: 'headphones', 2: 'smartwatch', 3: 'jacket', 4: 'sneakers',
+  5: 'lamp', 6: 'skincare', 7: 'book', 8: 'yoga',
+  9: 'keyboard', 10: 'toys', 11: 'rice', 12: 'backpack',
+  13: 'tshirt', 14: 'bottle', 15: 'pencils', 16: 'lipstick'
+};
+
+const imgOf = p => p.img ||
+  `https://loremflickr.com/800/640/${KEYWORDS[p.id]}?lock=${p.id}`;
 const stockOf = p => p.stock || 20;
 const descOf = p => p.desc ||
   `${p.name} from our ${p.cat} collection. Carefully selected for quality and everyday value.`;
