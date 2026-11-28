@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile | VERISE</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+
+<main class="container">
+  <div class="profile">
+    <div class="p-head">
+      <div class="avatar" id="avatar"></div>
+      <div>
+        <h1 id="pName"></h1>
+        <p id="pEmail"></p>
+      </div>
+    </div>
+
+    <div class="p-body">
+      <div id="msg" class="msg"></div>
+
+      <div class="info">
+        <div><small>Full name</small><span id="iName"></span></div>
+        <div><small>Email</small><span id="iEmail"></span></div>
+        <div><small>Mobile number</small><span id="iPhone"></span></div>
+        <div><small>Member since</small><span id="iJoined"></span></div>
+      </div>
+
+      <form id="editBox" hidden novalidate>
+        <div class="field">
+          <label for="editName">Full name</label>
+          <input id="editName" type="text">
+          <div class="err" id="editNameErr"></div>
+        </div>
+        <div class="field">
+          <label for="editPhone">Mobile number</label>
+          <input id="editPhone" type="tel" maxlength="10">
+          <div class="err" id="editPhoneErr"></div>
+        </div>
+        <div class="btns">
+          <button class="btn btn-primary" type="submit">Save changes</button>
+          <button class="btn btn-ghost" type="button" onclick="toggleEdit(false)">Cancel</button>
+        </div>
+      </form>
+
+      <div class="btns" id="actions">
+        <button class="btn btn-primary" onclick="toggleEdit(true)">Edit profile</button>
+        <a class="btn btn-ghost" href="cart.html">My cart</a>
+        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="footer"></div>
+<script src="js/app.js"></script>
+<script>
+// Only logged-in users can see this page.
+const user = getCurrentUser();
+if (!user) location.href = 'login.html';
+
+function showProfile() {
+  const u = getCurrentUser();
+  document.getElementById('avatar').textContent = u.name.charAt(0).toUpperCase();
+  document.getElementById('pName').textContent = u.name;
+  document.getElementById('pEmail').textContent = u.email;
+  document.getElementById('iName').textContent = u.name;
+  document.getElementById('iEmail').textContent = u.email;
+  document.getElementById('iPhone').textContent = u.phone || 'Not added';
+  document.getElementById('iJoined').textContent = u.joined
+    ? new Date(u.joined).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '—';
+}
+
+function toggleEdit(show) {
+  const u = getCurrentUser();
+  document.getElementById('editName').value = u.name;
+  document.getElementById('editPhone').value = u.phone || '';
+  document.getElementById('editBox').hidden = !show;
+  document.getElementById('actions').hidden = show;
+}
+
+document.getElementById('editBox').addEventListener('submit', event => {
+  event.preventDefault();
+
+  const name = document.getElementById('editName').value.trim();
+  const phone = document.getElementById('editPhone').value.trim();
+  let ok = true;
+
+  if (name.length < 2) { setErr('editName', 'Please enter your full name.'); ok = false; }
+  else setErr('editName', '');
+
+  if (!isPhone(phone)) { setErr('editPhone', 'Enter a valid 10-digit mobile number.'); ok = false; }
+  else setErr('editPhone', '');
+
+  if (!ok) return;
+
+  const users = getUsers();
+  const me = users.find(u => u.email === getCurrentUser().email);
+  me.name = name;
+  me.phone = phone;
+  saveUsers(users);
+
+  toggleEdit(false);
+  showProfile();
+  renderNavbar();
+  showMsg('Profile updated successfully.', true);
+});
+
+if (user) showProfile();
+</script>
+</body>
+</html>
