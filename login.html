@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | VERISE</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+
+<main class="auth">
+  <aside class="auth-side">
+    <h2>Welcome back</h2>
+    <p>Login to continue shopping on VERISE.</p>
+    <ul>
+      <li>View your cart and wishlist</li>
+      <li>Check out faster</li>
+      <li>Manage your profile</li>
+    </ul>
+  </aside>
+
+  <section class="auth-card">
+    <h1>Login</h1>
+    <p class="sub">Enter your details to continue.</p>
+    <div id="msg" class="msg"></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email">
+        <div class="err" id="emailErr"></div>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password">
+        <div class="err" id="passwordErr"></div>
+      </div>
+      <div class="row-between">
+        <label><input type="checkbox" id="remember"> Remember me</label>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Login</button>
+    </form>
+
+    <p class="alt">New to VERISE? <a href="register.html">Create an account</a></p>
+  </section>
+</main>
+
+<div id="footer"></div>
+<script src="js/app.js"></script>
+<script>
+async function hash(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Already logged in? Go straight to the homepage.
+if (getCurrentUser()) location.href = 'index.html';
+
+document.getElementById('loginForm').addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const email = document.getElementById('email').value.trim().toLowerCase();
+  const password = document.getElementById('password').value;
+  let ok = true;
+
+  if (!isEmail(email)) { setErr('email', 'Enter a valid email address.'); ok = false; }
+  else setErr('email', '');
+
+  if (!password) { setErr('password', 'Please enter your password.'); ok = false; }
+  else setErr('password', '');
+
+  if (!ok) return;
+
+  const user = getUsers().find(u => u.email === email);
+
+  if (!user || user.password !== await hash(password)) {
+    showMsg('Incorrect email or password.', false);
+    return;
+  }
+
+  sessionStorage.setItem('verise_user', user.email);
+  if (document.getElementById('remember').checked) {
+    localStorage.setItem('verise_remember', user.email);
+  }
+
+  showMsg('Login successful! Redirecting…', true);
+  setTimeout(() => (location.href = 'index.html'), 800);
+});
+</script>
+</body>
+</html>
