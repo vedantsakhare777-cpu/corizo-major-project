@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart | VERISE</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="navbar"></div>
+<section class="section page-top"><div class="container">
+  <div class="head"><h2>Your Cart <span id="cartCount" class="sub"></span></h2>
+    <a href="products.html">Continue shopping →</a></div>
+
+  <div class="cart-empty" id="cartEmpty" hidden>
+    <h2>Your cart is empty</h2>
+    <p>Add something you love and it will show up here.</p>
+    <a class="btn btn-primary" href="products.html">Explore Products</a>
+  </div>
+
+  <div class="cart-layout" id="cartLayout">
+    <div id="cartItems"></div>
+    <aside class="summary">
+      <h2>Order summary</h2>
+      <div class="sline"><span>Subtotal</span><b id="subtotal">₹0</b></div>
+      <div class="sline"><span>Delivery</span><b id="shipping">Free</b></div>
+      <div class="sline total"><span>Total</span><b id="grand">₹0</b></div>
+      <p class="snote" id="shipNote"></p>
+      <button class="btn btn-primary btn-block" onclick="checkout()">Continue to checkout</button>
+    </aside>
+  </div>
+</div></section>
+<div id="footer"></div>
+<script src="js/app.js"></script>
+</body>
+</html>
